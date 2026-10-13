@@ -1,42 +1,20 @@
-from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Pelicula, Resenia
 from .serializers import (
     PeliculaSerializer,
-    ReseniaSerializer,
     ReseniaPublicSerializer,
 )
 
 
-class PeliculasListCreateAPIView(generics.ListCreateAPIView):
-    name = "Peliculas API"
+class PeliculaViewSet(viewsets.ModelViewSet):
     queryset = Pelicula.objects.all()
     serializer_class = PeliculaSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class PeliculasDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    name = "Peliculas API"
-    queryset = Pelicula.objects.all()
-    serializer_class = PeliculaSerializer
-
-
-class ReseniasListCreateAPIView(generics.ListCreateAPIView):
-    name = "Reseñas API"
+class ReseniaViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Resenia.objects.all().select_related("pelicula")
-
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return ReseniaPublicSerializer
-        else:
-            return ReseniaSerializer
-
-
-class ReseniasDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    name = "Reseñas API"
-    queryset = Resenia.objects.all().select_related("pelicula")
-
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return ReseniaPublicSerializer
-        else:
-            return ReseniaSerializer
+    serializer_class = ReseniaPublicSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
